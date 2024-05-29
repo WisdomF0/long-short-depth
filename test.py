@@ -1,6 +1,8 @@
 import model.model as module
 import model.lsdepth as lsdepth
 
+from dataloader.ls_dataset import LongShortDataset
+
 import torch
 from torchsummary import summary
 import numpy as np
@@ -148,7 +150,12 @@ def testModule():
     print("result:", data_dict["result"].shape)
     print("result mono:", data_dict["result_mono"].shape)
 
-testModule()
+def testdataset():
+    dataset = LongShortDataset("/home/fengyaohui/data/kitti/", "./filenames/mytrain.txt")
+    print(dataset[0]['rightframe'].min(), dataset[0]['rightframe'].max())
+    print(dataset[0]['ground_truth'].min(), dataset[0]['ground_truth'].max())
+
+
 
 # for k, v in output.items():
 #     if not isinstance(v, torch.Tensor):

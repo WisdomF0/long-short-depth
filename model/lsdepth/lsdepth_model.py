@@ -84,19 +84,19 @@ class BruteModel(nn.Module):
         assert self.backbone_type in ["resnet18", "efficientnetb5"]
 
         if self.backbone_type == 'resnet18':
-            self._feature_extractor = ResnetEncoder(num_layers=18, pretrained=self.backbone_pretrain)
+            self._feature_extractor = ResnetEncoder(num_layers=18, pretrained=self.backbone_pretrain).to(device)
         elif self.backbone_type == 'efficientnetb5':
-            self._feature_extractor = EfficientNetEncoder(pretrained=self.backbone_pretrain)
+            self._feature_extractor = EfficientNetEncoder(pretrained=self.backbone_pretrain).to(device)
 
-        self.fusion_model = BruteFusion(depth_steps=self.cv_depth_steps, feature_channels=self._feature_extractor.num_ch_enc)
+        self.fusion_model = BruteFusion(depth_steps=self.cv_depth_steps, feature_channels=self._feature_extractor.num_ch_enc).to(device)
 
         if freez_backbone:
             for p in self._feature_extractor.parameters(True):
                 p.requires_grad_(False)
 
-        self.cv_module = GWCStereoModule(self.cv_depth_steps * 4, use_concat_volume=True)
-        self.st_module = GWCDModule(56, 1)
-        self.mono_module = MonoDepthModule()
+        self.cv_module = GWCStereoModule(self.cv_depth_steps * 4, use_concat_volume=True).to(device)
+        self.st_module = GWCDModule(56, 1).to(device)
+        self.mono_module = MonoDepthModule().to(device)
 
         if self.gwc_pretrain is not None:
             if isinstance(self.gwc_pretrain, str):
@@ -153,8 +153,8 @@ class BruteModel(nn.Module):
             for pred in self.fusion_model(pseudo_mono_cost, data_dict["cost_volume"], data_dict["left_features"])
         ]
 
-        data_dict["result"] = data_dict["predicted_inverse_depths"][0]
-        data_dict["result_mono"] = data_dict["predicted_inverse_depths_mono"][0]
+        data_dict["result"] = data_dict["predicted_inverse_depths"][0].squeeze(1)
+        data_dict["result_mono"] = data_dict["predicted_inverse_depths_mono"][0].squeeze(1)
 
         return data_dict
 

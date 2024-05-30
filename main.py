@@ -31,7 +31,7 @@ batch_size = 16
 test_batch_size = 8
 train_workers = 32
 test_workers = 16
-lr = 0.01
+lr = 0.001
 lrepochs = "10,12,14,16:2"
 maxdisp = 192
 
